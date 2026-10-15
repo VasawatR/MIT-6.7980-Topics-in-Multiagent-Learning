@@ -210,7 +210,11 @@ Complexity-theoretic considerations regarding the hardness of approximating Nash
 #paragraph-marker() *Best-iterate convergence.*~~
 #citet(<Anagnostides22:Last-Iterate>) showed that when both players use optimistic gradient ascent, the _best_ iterate converges to the Nash equilibrium in two-player zero-sum games at the rate of $O_T (1\/sqrt(T))$. The proof has two steps, and both are elementary calculations.
 
-*Setting.* Both players run optimistic gradient ascent with $eta <= 1\/(4 norm(mU)_"op")$, so that the RVU bounds of the accelerated-convergence theorem hold with constants $Omega_1, Omega_2$. The players receive the gradients $vg_x^((t)) = mU vy^((t))$ and $vg_y^((t)) = -mU^top vx^((t))$, and $vz^((t)), vw^((t))$ denote their intermediate iterates, as in the update rule of the optimistic gradient ascent example. Let $D$ be the largest diameter of $cX$ and $cY$, and $G$ a bound on the gradient norms.
+*Setting.* Both players run optimistic gradient ascent with $eta <= 1\/(4 norm(mU)_"op")$, so that the RVU bounds of the accelerated-convergence theorem hold with constants $Omega_1, Omega_2$. Throughout, $norm(dot.c)$ is the Euclidean norm, so that $norm(dot.c)_* = norm(dot.c)$ and $norm(mU^top)_"op" = norm(mU)_"op"$. The players receive the gradients $vg_x^((t)) = mU vy^((t))$ and $vg_y^((t)) = -mU^top vx^((t))$, and $vz^((t)), vw^((t))$ denote their intermediate iterates, as in the update rule of the optimistic gradient ascent example. Shifting the index in the second update of @eq-ogda, we have the identities
+$
+  vz^((t+1)) = Pi_cX (vz^((t)) + eta vg_x^((t))), qquad vx^((t)) = Pi_cX (vz^((t)) + eta vg_x^((t-1))),
+$
+and, analogously for Player 2, $vw^((t+1)) = Pi_cY (vw^((t)) + eta vg_y^((t)))$ and $vy^((t)) = Pi_cY (vw^((t)) + eta vg_y^((t-1)))$. Let $D$ be the largest diameter of $cX$ and $cY$, and $G$ a bound on the gradient norms. We use the RVU bounds with the sums of squared movements starting at $t = 2$. The prediction-error term at $t = 1$ is at most $eta G^2$ (taking $vm^((1)) = 0$), and we absorb it into the constants $Omega_1, Omega_2$.
 
 #theorem[Best-iterate convergence, #citep(<Anagnostides22:Last-Iterate>)][
   For any $epsilon > 0$ and $T >= 2 + 32 (Omega_1 + Omega_2) \/ epsilon^2$, there is a $t in {3, dots, T}$ such that neither player can gain more than $epsilon (2 D \/ eta + G)$ by deviating from $(vx^((t)), vy^((t)))$. In particular, the best iterate among the first $T$ is an $O_T (1\/sqrt(T))$-approximate Nash equilibrium.
@@ -218,15 +222,16 @@ Complexity-theoretic considerations regarding the hardness of approximating Nash
 
 #proof[
   First, the RVU bound implies that the sum of the squared distances between consecutive iterates is bounded by a constant, so some iterate barely moves. Second, small movement implies proximity to a Nash equilibrium.
+  
   *Step 1: The sum of squared distances between consecutive iterates is bounded.* We claim that
   $
-    sum_(t=1)^T ( norm(vx^((t)) - vx^((t-1)))^2 + norm(vy^((t)) - vy^((t-1)))^2 ) <= 16 (Omega_1 + Omega_2).
+    sum_(t=2)^T ( norm(vx^((t)) - vx^((t-1)))^2 + norm(vy^((t)) - vy^((t-1)))^2 ) <= 16 (Omega_1 + Omega_2).
   $
   Adding up the two RVU bounds and using $norm(mU (vy^((t)) - vy^((t-1))))_* <= norm(mU)_"op" norm(vy^((t)) - vy^((t-1)))$ (and similarly for $mU^top$), as in the proof of the accelerated-convergence theorem, we get
   $
-    "Reg"_1^((T)) + "Reg"_2^((T)) <= (Omega_1 + Omega_2) / eta + (eta norm(mU)_"op"^2 - 1 / (8 eta)) sum_(t=1)^T ( norm(vx^((t)) - vx^((t-1)))^2 + norm(vy^((t)) - vy^((t-1)))^2 ).
+    "Reg"_1^((T)) + "Reg"_2^((T)) <= (Omega_1 + Omega_2) / eta + (eta norm(mU)_"op"^2 - 1 / (8 eta)) sum_(t=2)^T ( norm(vx^((t)) - vx^((t-1)))^2 + norm(vy^((t)) - vy^((t-1)))^2 ).
   $
-  Since $eta norm(mU)_"op" <= 1\/4$, the coefficient is at most $-1\/(16 eta)$. By the regret-to-saddle-point-gap identity, $"Reg"_1^((T)) + "Reg"_2^((T)) >= 0$ in a zero-sum game, so $0 <= (Omega_1 + Omega_2)\/eta - 1\/(16 eta) sum_(t=1)^T (dots)$, which rearranges to the claim.
+  Since $eta norm(mU)_"op" <= 1\/4$, we have $eta norm(mU)_"op"^2 = (eta norm(mU)_"op")^2 \/ eta <= 1\/(16 eta)$, so the coefficient is at most $1\/(16 eta) - 1\/(8 eta) = -1\/(16 eta)$. By the regret-to-saddle-point-gap identity, $"Reg"_1^((T)) + "Reg"_2^((T)) >= 0$ in a zero-sum game, so $0 <= (Omega_1 + Omega_2)\/eta - 1\/(16 eta) sum_(t=2)^T (dots)$, which rearranges to the claim.
 
   *Step 2: Small movement implies proximity to a Nash equilibrium.* Suppose that for _every_ $t in {3, dots, T}$,
   $
